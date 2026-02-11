@@ -25,12 +25,9 @@ func worker(ctx context.Context, jobs chan int, wg *sync.WaitGroup) {
 		case job := <-jobs:
 			// вывод в stdout
 			fmt.Println(job)
-			// ждем секунду для имитации долгой задачи
-			time.Sleep(time.Second * 1)
 		// чтение из канала об отмене контекста
 		case <-ctx.Done():
-			// печать сообщения о ctrl + c
-			fmt.Println("Нажали ctrl + c, изящное завершение горутины")
+			fmt.Println("Graceful shutdown")
 			// выход из цикла(прекращение работы горутины)
 			return
 		}
@@ -56,9 +53,6 @@ func main() {
 		signal.Notify(sigchan, os.Interrupt)
 		// блокировка горутины, пока не будет получен сигнал отмены(ctrl + c)
 		<-sigchan
-		// печать текста о нажатии ctrl + c
-		fmt.Println("Нажали ctrl + c, передаю контекст горутинам")
-		// функция отмены контекста
 		cancel()
 	}()
 
