@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"sync"
 )
 
@@ -17,15 +18,17 @@ func worker(jobs chan int, wg *sync.WaitGroup) {
 }
 
 func main() {
-	// создания буферизованного канала jobs с размером 5, чтобы не ждать, пока горутины прочитают из канала
-	jobs := make(chan int, 10)
+	jobs := make(chan int)
 	// инициализация waitgroup
 	var wg sync.WaitGroup
 	// объявление 2 переменных типа int для хранения количества воркеров и количества данных для записи в канала jobs
 	var N, n int
 	n = 10
 	// чтение из stdin
-	fmt.Scan(&N)
+	_, err := fmt.Scan(&N)
+	if err != nil {
+		log.Fatal("failed to scan stdin")
+	}
 
 	// запуск необходимого количества воркеров в горутинах
 	for i := 1; i <= N; i++ {
@@ -48,7 +51,7 @@ func main() {
 	for i := 1; i <= n; i++ {
 		jobs <- 1
 	}
-	
+
 	// закрытие канала jobs, чтобы горутины не ждали чтение из него и не было блокировок
 	close(jobs)
 
