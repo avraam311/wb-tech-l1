@@ -1,53 +1,36 @@
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
-// функцию, которая принимает строку и возвращает строку, где порядок слов перевернут
+// reverseWords принимает строку и возвращает строку, где порядок слов перевёрнут
 func reverseWords(s string) string {
-	// переводим строку в срез рун, чтобы символы unicode не ломались
-	runes := []rune(s)
+	b := []byte(s)
 
 	// переворачиваем всю строку
-	reverse(runes)
+	reverse(b)
 
-	// обозначаем начало среза рун(далее это переменная нужна будет, чтобы обозначать начало слов)
 	start := 0
-	// проходимя цикло по срезу рун
-	for i := range runes {
-		// если руна равна пробелму, то переворачиваем слово, так как пробел указывает на начало нового слова
-		if runes[i] == ' ' {
-			// переменная, которая указывает на конец слова(создана для ясности, можно было использовать i)
-			end := i - 1
-			// переворачиваем слово
-			reverse(runes[start : end+1])
-			// обозначаем начало нового слова
+	for i := range b {
+		if b[i] == ' ' {
+			reverse(b[start:i]) // слово от start до i-1
 			start = i + 1
 		}
 	}
+	// последнее слово
+	reverse(b[start:])
 
-	// переворачиваем последнее слово отдельно, потому что после него нет пробела и if выше не сработает для него
-	reverse(runes[start:])
-
-	// возвращаем срез рун, конвертировав его в строку
-	return string(runes)
+	return string(b)
 }
 
-// вспомогательная функция для переворота среза рун
-// она ничего не возвращает, потому что Golang автоматически указывает ссылки на исходный массив среза
-// и срез рун снаружи тоже меняется
-func reverse(runes []rune) {
-	// проходимся по циклу
-	// left = крайный левый символ, right = крайник правый символ, меняем их местами
-	// и в каждой итерации идем на 1 символ ближе к центру и меняем снова
-	for left, right := 0, len(runes)-1; left < right; left, right = left+1, right-1 {
-		runes[left], runes[right] = runes[right], runes[left]
+// reverse переворачивает срез байт на месте
+func reverse(b []byte) {
+	for left, right := 0, len(b)-1; left < right; left, right = left+1, right-1 {
+		b[left], b[right] = b[right], b[left]
 	}
 }
 
 func main() {
 	s := "snow dog sun"
 	s = reverseWords(s)
-	fmt.Println(s)
+	fmt.Println(s) // "sun dog snow"
 }
